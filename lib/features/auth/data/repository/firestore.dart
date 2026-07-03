@@ -9,6 +9,7 @@ class AuthRepository {
   final FirebaseAuth auth;
   AuthRepository({required this.firestore, required this.auth});
 
+  // Checks if the email is already registered in the Firestore users collection
   Future<Either<Failure, bool>> checkEmailForDuplicate(String email) async {
     try {
       var user = await firestore
@@ -24,6 +25,7 @@ class AuthRepository {
     }
   }
 
+  // Adds the user's completed profile metadata into the Firestore users collection
   Future<Either<Failure, bool>> registerUser(Map<String, dynamic> data) async {
     try {
       var res = await firestore.collection("users").add(data);
@@ -36,6 +38,7 @@ class AuthRepository {
     }
   }
 
+  // Logs a user in with their email and password using Firebase Auth
   Future<Either<Failure, bool>> login(LoginDataModel data) async {
     try {
       var res = await auth.signInWithEmailAndPassword(

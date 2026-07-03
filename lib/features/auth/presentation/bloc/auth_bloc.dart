@@ -7,7 +7,9 @@ import 'auth_event.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository authRepository;
+
   AuthBloc({required this.authRepository}) : super(AuthInitial()) {
+    // Handler for duplicate email verification check on Registration page
     on<SignUp>((event, emit) async {
       emit(SignUpLoading());
       final res = await authRepository.checkEmailForDuplicate(event.email);
@@ -18,6 +20,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
     });
 
+    // Handler for signing in registered user accounts
     on<LogIn>((event, emit) async {
       emit(LogInLoading());
       final res = await authRepository.login(
@@ -29,10 +32,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
     });
 
+    // Handler to create Firebase Auth credentials and store user profile in Firestore
     on<CreateProfile>((event, emit) async {
       emit(CreateProfileLoading());
       try {
-        // Create user in Firebase Auth on the Profile page submit
         final authRes = await authRepository.auth
             .createUserWithEmailAndPassword(
               email: event.email,
