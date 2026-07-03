@@ -10,16 +10,22 @@ To ensure high data integrity and a seamless user experience, the authentication
 
 ```mermaid
 graph TD
-    A[Register Screen] -- 1. Submit email/password --> B(AuthBloc: SignUp)
-    B -- 2. Check for duplicate email in Firestore 'users' --> C{Is unique?}
-    C -- No --> D[Show error message]
-    C -- Yes --> E(Emit SignUpSuccess with credentials)
-    E -- 3. Redirect to Profile Screen with parameters --> F[Profile Screen]
-    F -- 4. Prefills read-only email & collects basic details --> G(AuthBloc: CreateProfile)
-    G -- 5. Calls Firebase Auth: createUserWithEmailAndPassword --> H{Auth Success?}
-    H -- No --> I[Show failure SnackBar]
-    H -- Yes --> J[Save profile to Firestore 'users' collection]
-    J -- 6. Redirect to Home Dashboard --> K[Home Dashboard]
+    Start[Login Screen] -->|Click Register| Reg[Register Screen]
+    Start -->|Submit Credentials| LogIn[AuthBloc: LogIn]
+    LogIn -->|Success| Home[Home Dashboard]
+    LogIn -->|Failure| ErrorLog[Show Login Error]
+
+    Reg -->|Submit email/password| SignUp[AuthBloc: SignUp]
+    SignUp -->|Check duplicate in users collection| Unique{Is unique?}
+    Unique -->|No| ErrorReg[Show error message]
+    Unique -->|Yes| SignUpSuccess(Emit SignUpSuccess with credentials)
+    
+    SignUpSuccess -->|Redirect to Profile Screen| Profile[Profile Screen]
+    Profile -->|Submit details| CreateProfile[AuthBloc: CreateProfile]
+    CreateProfile -->|Calls Firebase: createUserWithEmailAndPassword| AuthSuccess{Auth Success?}
+    AuthSuccess -->|No| ErrorProfile[Show failure SnackBar]
+    AuthSuccess -->|Yes| SaveProfile[Save profile to Firestore 'users' collection]
+    SaveProfile -->|Redirect| Home
 ```
 
 1.  **Register Page**: Checks if the email is a duplicate in the Firestore database. On confirmation of uniqueness, it navigates to the Profile creation page, passing the credentials.
